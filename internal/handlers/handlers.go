@@ -3,9 +3,9 @@ package handlers
 import (
 	"encoding/json"
 	"fmt"
-	"github.com/emiljannesson/bed-and-breakfast/pkg/config"
-	"github.com/emiljannesson/bed-and-breakfast/pkg/models"
-	"github.com/emiljannesson/bed-and-breakfast/pkg/render"
+	"github.com/emiljannesson/bed-and-breakfast/internal/config"
+	"github.com/emiljannesson/bed-and-breakfast/internal/models"
+	"github.com/emiljannesson/bed-and-breakfast/internal/render"
 	"log"
 	"net/http"
 )

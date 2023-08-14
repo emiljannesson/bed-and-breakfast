@@ -2,8 +2,8 @@ package render
 
 import (
 	"bytes"
-	"github.com/emiljannesson/bed-and-breakfast/pkg/config"
-	"github.com/emiljannesson/bed-and-breakfast/pkg/models"
+	"github.com/emiljannesson/bed-and-breakfast/internal/config"
+	"github.com/emiljannesson/bed-and-breakfast/internal/models"
 	"github.com/justinas/nosurf"
 	"html/template"
 	"log"

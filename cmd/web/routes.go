@@ -1,8 +1,8 @@
 package main
 
 import (
-	"github.com/emiljannesson/bed-and-breakfast/pkg/config"
-	"github.com/emiljannesson/bed-and-breakfast/pkg/handlers"
+	"github.com/emiljannesson/bed-and-breakfast/internal/config"
+	"github.com/emiljannesson/bed-and-breakfast/internal/handlers"
 	"github.com/go-chi/chi"
 	"github.com/go-chi/chi/middleware"
 	"net/http"
