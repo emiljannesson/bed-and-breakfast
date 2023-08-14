@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"github.com/emiljannesson/bed-and-breakfast/pkg/config"
 	"github.com/emiljannesson/bed-and-breakfast/pkg/models"
+	"github.com/justinas/nosurf"
 	"html/template"
 	"log"
 	"net/http"
@@ -17,13 +18,13 @@ func NewTemplates(a *config.AppConfig) {
 	app = a
 }
 
-func AddDefaultData(td *models.TemplateData) *models.TemplateData {
-	// todo: add data we want added to all pages before we execute the template
+func AddDefaultData(td *models.TemplateData, r *http.Request) *models.TemplateData {
+	td.CSRFToken = nosurf.Token(r)
 	return td
 }
 
 // RenderTemplate renders templates using html/template
-func RenderTemplate(w http.ResponseWriter, tmpl string, templateData *models.TemplateData) {
+func RenderTemplate(w http.ResponseWriter, r *http.Request, tmpl string, templateData *models.TemplateData) {
 	var templateCache map[string]*template.Template
 
 	if app.UseCache {
@@ -42,7 +43,7 @@ func RenderTemplate(w http.ResponseWriter, tmpl string, templateData *models.Tem
 	// this is arbitrary and not necessary, allows finer grained error checking
 	buf := new(bytes.Buffer)
 
-	templateData = AddDefaultData(templateData)
+	templateData = AddDefaultData(templateData, r)
 
 	err := t.Execute(buf, templateData)
 	if err != nil {
