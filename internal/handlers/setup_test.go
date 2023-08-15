@@ -5,13 +5,16 @@ import (
 	"fmt"
 	"github.com/alexedwards/scs/v2"
 	"github.com/emiljannesson/bed-and-breakfast/internal/config"
+	"github.com/emiljannesson/bed-and-breakfast/internal/helpers"
 	"github.com/emiljannesson/bed-and-breakfast/internal/models"
 	"github.com/emiljannesson/bed-and-breakfast/internal/render"
 	"github.com/go-chi/chi"
 	"github.com/go-chi/chi/middleware"
 	"github.com/justinas/nosurf"
 	"html/template"
+	"log"
 	"net/http"
+	"os"
 	"path/filepath"
 	"time"
 )
@@ -27,6 +30,12 @@ func getRoutes() http.Handler {
 
 	// change to true when in production
 	appConfig.InProduction = false
+
+	infoLog := log.New(os.Stdout, "INFO\t", log.Ldate|log.Ltime)
+	appConfig.InfoLog = infoLog
+
+	errorLog := log.New(os.Stdout, "ERROR\t", log.Ldate|log.Ltime|log.Lshortfile)
+	appConfig.ErrorLog = errorLog
 
 	session = scs.New()
 	session.Lifetime = 24 * time.Hour
@@ -44,8 +53,8 @@ func getRoutes() http.Handler {
 
 	repo := NewRepo(&appConfig)
 	NewHandlers(repo)
-
 	render.NewTemplates(&appConfig)
+	helpers.NewHelpers(&appConfig)
 
 	mux := chi.NewRouter()
 

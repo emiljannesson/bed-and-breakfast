@@ -10,6 +10,7 @@ import (
 type AppConfig struct {
 	UseCache      bool
 	TemplateCache map[string]*template.Template
+	ErrorLog      *log.Logger
 	InfoLog       *log.Logger
 	InProduction  bool
 	Session       *scs.SessionManager

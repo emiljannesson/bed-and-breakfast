@@ -6,10 +6,12 @@ import (
 	"github.com/alexedwards/scs/v2"
 	"github.com/emiljannesson/bed-and-breakfast/internal/config"
 	"github.com/emiljannesson/bed-and-breakfast/internal/handlers"
+	"github.com/emiljannesson/bed-and-breakfast/internal/helpers"
 	"github.com/emiljannesson/bed-and-breakfast/internal/models"
 	"github.com/emiljannesson/bed-and-breakfast/internal/render"
 	"log"
 	"net/http"
+	"os"
 	"time"
 )
 
@@ -17,6 +19,8 @@ const portNumber = ":8080"
 
 var appConfig config.AppConfig
 var session *scs.SessionManager
+var infoLog *log.Logger
+var errorLog *log.Logger
 
 func main() {
 	err := run()
@@ -41,6 +45,12 @@ func run() error {
 	// change to true when in production
 	appConfig.InProduction = false
 
+	infoLog = log.New(os.Stdout, "INFO\t", log.Ldate|log.Ltime)
+	appConfig.InfoLog = infoLog
+
+	errorLog = log.New(os.Stdout, "ERROR\t", log.Ldate|log.Ltime|log.Lshortfile)
+	appConfig.ErrorLog = errorLog
+
 	session = scs.New()
 	session.Lifetime = 24 * time.Hour
 	session.Cookie.Persist = true
@@ -58,8 +68,8 @@ func run() error {
 
 	repo := handlers.NewRepo(&appConfig)
 	handlers.NewHandlers(repo)
-
 	render.NewTemplates(&appConfig)
+	helpers.NewHelpers(&appConfig)
 
 	return nil
 }
