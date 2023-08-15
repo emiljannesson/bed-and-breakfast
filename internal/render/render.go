@@ -2,6 +2,7 @@ package render
 
 import (
 	"bytes"
+	"errors"
 	"fmt"
 	"github.com/emiljannesson/bed-and-breakfast/internal/config"
 	"github.com/emiljannesson/bed-and-breakfast/internal/models"
@@ -32,7 +33,7 @@ func AddDefaultData(td *models.TemplateData, r *http.Request) *models.TemplateDa
 }
 
 // RenderTemplate renders templates using html/template
-func RenderTemplate(w http.ResponseWriter, r *http.Request, tmpl string, templateData *models.TemplateData) {
+func RenderTemplate(w http.ResponseWriter, r *http.Request, tmpl string, templateData *models.TemplateData) error {
 	var templateCache map[string]*template.Template
 
 	if app.UseCache {
@@ -45,7 +46,8 @@ func RenderTemplate(w http.ResponseWriter, r *http.Request, tmpl string, templat
 	// get  requested template from cache
 	t, ok := templateCache[tmpl]
 	if !ok {
-		log.Fatal("Could not get template from template cache")
+		//log.Fatal("Could not get template from template cache")
+		return errors.New("could not get template from template cache")
 	}
 
 	// this is arbitrary and not necessary, allows finer grained error checking
@@ -62,7 +64,10 @@ func RenderTemplate(w http.ResponseWriter, r *http.Request, tmpl string, templat
 	_, err = buf.WriteTo(w)
 	if err != nil {
 		log.Println(err)
+		return err
 	}
+
+	return nil
 }
 
 func CreateTemplateCache() (map[string]*template.Template, error) {
