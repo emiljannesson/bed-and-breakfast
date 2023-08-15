@@ -3,6 +3,7 @@ package handlers
 import (
 	"net/http"
 	"net/http/httptest"
+	"net/url"
 	"testing"
 )
 
@@ -67,6 +68,62 @@ var theTests = []struct {
 		params:             []postData{},
 		expectedStatusCode: http.StatusOK,
 	},
+	{
+		name:   "post-search-availability",
+		url:    "/search-availability",
+		method: "POST",
+		params: []postData{
+			{
+				key:   "start",
+				value: "2023-08-15",
+			},
+			{
+				key:   "end",
+				value: "2023-08-16",
+			},
+		},
+		expectedStatusCode: http.StatusOK,
+	},
+	{
+		name:   "post-search-availability-json",
+		url:    "/search-availability-json",
+		method: "POST",
+		params: []postData{
+			{
+				key:   "start",
+				value: "2023-08-15",
+			},
+			{
+				key:   "end",
+				value: "2023-08-16",
+			},
+		},
+		expectedStatusCode: http.StatusOK,
+	},
+	{
+		name:   "post-make-reservation",
+		url:    "/make-reservation",
+		method: "POST",
+		params: []postData{
+			{
+				key:   "first_name",
+				value: "John",
+			},
+			{
+				key:   "last_name",
+				value: "Smith",
+			},
+			{
+				key:   "email",
+				value: "test@example.com",
+			},
+			{
+				key:   "phone",
+				value: "888-555-5555",
+			},
+		},
+		expectedStatusCode: http.StatusOK,
+	},
 }
 
 func TestHandlers(t *testing.T) {
@@ -85,7 +142,18 @@ func TestHandlers(t *testing.T) {
 				t.Errorf("test failed: %s, expected %d but got %d", test.name, test.expectedStatusCode, resp.StatusCode)
 			}
 		} else {
+			values := url.Values{}
+			for _, x := range test.params {
+				values.Add(x.key, x.value)
+			}
+			resp, err := testServer.Client().PostForm(testServer.URL+test.url, values)
+			if err != nil {
+				t.Fatal(err)
+			}
 
+			if resp.StatusCode != test.expectedStatusCode {
+				t.Errorf("test failed: %s, expected %d but got %d", test.name, test.expectedStatusCode, resp.StatusCode)
+			}
 		}
 	}
 }
