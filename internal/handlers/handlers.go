@@ -5,10 +5,13 @@ import (
 	"errors"
 	"fmt"
 	"github.com/emiljannesson/bed-and-breakfast/internal/config"
+	"github.com/emiljannesson/bed-and-breakfast/internal/driver"
 	"github.com/emiljannesson/bed-and-breakfast/internal/forms"
 	"github.com/emiljannesson/bed-and-breakfast/internal/helpers"
 	"github.com/emiljannesson/bed-and-breakfast/internal/models"
 	"github.com/emiljannesson/bed-and-breakfast/internal/render"
+	"github.com/emiljannesson/bed-and-breakfast/internal/repository"
+	"github.com/emiljannesson/bed-and-breakfast/internal/repository/dbrepo"
 	"net/http"
 )
 
@@ -18,12 +21,14 @@ var Repo *Repository
 // Repository is the repository type
 type Repository struct {
 	App *config.AppConfig
+	DB  repository.DatabaseRepo
 }
 
 // NewRepo creates a new repository
-func NewRepo(a *config.AppConfig) *Repository {
+func NewRepo(a *config.AppConfig, db *driver.DB) *Repository {
 	return &Repository{
 		App: a,
+		DB:  dbrepo.NewPostgresRepo(db.SQL, a),
 	}
 }
 

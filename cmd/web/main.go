@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"github.com/alexedwards/scs/v2"
 	"github.com/emiljannesson/bed-and-breakfast/internal/config"
+	"github.com/emiljannesson/bed-and-breakfast/internal/driver"
 	"github.com/emiljannesson/bed-and-breakfast/internal/handlers"
 	"github.com/emiljannesson/bed-and-breakfast/internal/helpers"
 	"github.com/emiljannesson/bed-and-breakfast/internal/models"
@@ -23,10 +24,11 @@ var infoLog *log.Logger
 var errorLog *log.Logger
 
 func main() {
-	err := run()
+	db, err := run()
 	if err != nil {
 		log.Fatal(err)
 	}
+	defer db.SQL.Close()
 
 	fmt.Println("Starting application on port", portNumber)
 
@@ -38,7 +40,7 @@ func main() {
 	}
 }
 
-func run() error {
+func run() (*driver.DB, error) {
 	// what am I going to put in the session
 	gob.Register(models.Reservation{})
 
@@ -59,17 +61,25 @@ func run() error {
 
 	appConfig.Session = session
 
+	// connect to database
+	log.Println("Connecting to database...")
+	db, err := driver.ConnectSQL("host=localhost port=5432 dbname=bookings user=postgres password=") // temporarily hard coded
+	if err != nil {
+		log.Fatal("Cannot connect to database, exiting...")
+	}
+	log.Println("Connected to database!")
+
 	tc, err := render.CreateTemplateCache()
 	if err != nil {
-		return err
+		return db, err
 	}
 	appConfig.TemplateCache = tc
 	appConfig.UseCache = false
 
-	repo := handlers.NewRepo(&appConfig)
+	repo := handlers.NewRepo(&appConfig, db)
 	handlers.NewHandlers(repo)
 	render.NewTemplates(&appConfig)
 	helpers.NewHelpers(&appConfig)
 
-	return nil
+	return db, nil
 }
